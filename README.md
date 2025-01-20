@@ -1,0 +1,1 @@
+Developed five interactive JavaScript projects, including an Add-to-Cart App, Weather App, To-Do List, Puzzle Game, and Numbrix Game, demonstrating proficiency in dynamic functionality and engaging user experiences.
