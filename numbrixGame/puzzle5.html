@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9x9 Numbrix Grid</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-gray-200">
+    <div class="container text-center p-2">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-700 mb-4">Numbrix Puzzle</h1>
+        <div class="navbar grid grid-cols-2 md:grid-cols-5 gap-2 bg-white p-4 rounded-lg shadow-md mx-auto mb-2 w-full max-w-xl">
+            <a href="index.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 1</div></a>
+            <a href="puzzle2.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 2</div></a>
+            <a href="puzzle3.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 3</div></a>
+            <a href="puzzle4.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 4</div></a>
+            <a href="#"><div class="bg-black text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 5</div></a>
+            <a href="puzzle6.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 6</div></a>
+            <a href="puzzle7.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 7</div></a>
+            <a href="puzzle8.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 8</div></a>
+            <a href="puzzle9.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 9</div></a>
+            <a href="puzzle10.html"><div class="bg-green-500 text-white py-2 px-2 md:px-4 rounded shadow-md text-xs md:text-base">Puzzle 10</div></a>
+        </div>
+        <div class="grid-container grid grid-cols-9 gap-1 bg-white p-2 md:p-4 rounded-lg shadow-md mx-auto w-full max-w-xl">
+        </div>
+        <div class="button-container mt-4">
+            <button id="checkButton" class="bg-green-500 text-white py-2 px-4 md:px-6 rounded shadow-md mr-2 text-sm md:text-base">Check</button>
+            <button id="restartButton" class="bg-green-500 text-white py-2 px-4 md:px-6 rounded shadow-md text-sm md:text-base">Restart</button>
+        </div>
+    </div>
+
+    <script>
+        const gridContainer = document.querySelector('.grid-container');
+        const checkButton = document.getElementById('checkButton');
+        const restartButton = document.getElementById('restartButton');
+
+        const initialNumbers = [
+             { row: 0, col: 2, value: 65 },
+             { row: 0, col: 3, value: 62 },
+             { row: 0, col: 5, value: 60 },
+             { row: 0, col: 6, value: 27 },
+             { row: 0, col: 8, value: 25 },
+             { row: 1, col: 0, value: 68 },
+             { row: 1, col: 1, value: 69 },
+             { row: 1, col: 4, value: 58 },
+             { row: 1, col: 7, value: 29 },
+             { row: 2, col: 0, value: 71 },
+             { row: 2, col: 2, value: 81 },
+             { row: 2, col: 3, value: 56 },
+             { row: 2, col: 6, value: 33 },
+             { row: 2, col: 6, value: 31 },
+             { row: 3, col: 1, value: 79 },
+             { row: 3, col: 5, value: 35 },
+             { row: 3, col: 7, value: 31 },
+             { row: 4, col: 2, value: 77 },
+             { row: 4, col: 4, value: 37 },
+             { row: 4, col: 6, value: 19 },
+             { row: 4, col: 8, value: 21 },
+             { row: 5, col: 0, value: 74 },
+             { row: 5, col: 1, value: 75 },
+             { row: 5, col: 3, value: 53 },
+             { row: 5, col: 5, value: 17 },
+             { row: 5, col: 7, value: 11 },
+             { row: 6, col: 0, value: 47 },
+             { row: 6, col: 2, value: 51 },
+             { row: 6, col: 3, value: 52 },
+             { row: 6, col: 5, value: 16 },
+             { row: 6, col: 8, value: 9 },
+             { row: 7, col: 1, value: 49 },
+             { row: 7, col: 2, value: 50 },
+             { row: 7, col: 4, value: 40 },
+             { row: 7, col: 6, value: 14 },
+             { row: 7, col: 2, value: 50 },
+             { row: 7, col: 7, value: 7 },
+             { row: 8, col: 0, value: 45 },
+             { row: 8, col: 3, value: 42 },
+             { row: 8, col: 4, value: 1 },
+             { row: 8, col: 8, value: 5 }
+        ];
+
+        for (let i = 0; i < 81; i++) {
+            const gridItem = document.createElement('div');
+            gridItem.classList.add('grid-item', 'flex', 'items-center', 'justify-center', 'border', 'border-gray-300', 'w-8', 'h-8', 'text-xs', 'md:w-12', 'md:h-12', 'md:text-lg', 'bg-gray-100', 'rounded-md');
+            const row = Math.floor(i / 9);
+            const col = i % 9;
+            const initialNumber = initialNumbers.find(num => num.row === row && num.col === col);
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 2; // max length for two-digit numbers
+            input.placeholder = '';
+            input.classList.add('w-full', 'h-full', 'border-none', 'text-center', 'bg-transparent', 'outline-none', 'text-xs', 'md:text-lg');
+
+            if (initialNumber) {
+                input.value = initialNumber.value;
+                input.disabled = true;
+            } else {
+                input.addEventListener('change', () => handleInput(input));
+            }
+
+            gridItem.appendChild(input);
+            gridContainer.appendChild(gridItem);
+        }
+
+        function handleInput(input) {
+            const value = parseInt(input.value, 10);
+            if (isNaN(value)) {
+                alert('Invalid move! Please enter a valid number.');
+                input.value = '';
+                return;
+            }
+            if (isDuplicate(value)) {
+                alert('Duplicate value! Please enter a different number.');
+                input.value = '';
+                return;
+            }
+            if (!isValidMove(input, value)) {
+                alert('Invalid move! Please enter a valid number.');
+                input.value = '';
+            }
+        }
+
+        function isDuplicate(value) {
+            const allInputs = gridContainer.querySelectorAll('input');
+            let count = 0;
+            allInputs.forEach(input => {
+                if (parseInt(input.value, 10) === value) {
+                    count++;
+                }
+            });
+            return count > 1;
+        }
+
+        function isValidMove(input, number) {
+            const index = Array.from(gridContainer.children).indexOf(input.parentElement);
+            const row = Math.floor(index / 9);
+            const col = index % 9;
+
+            const adjacentCells = [
+                getCell(row - 1, col),
+                getCell(row + 1, col),
+                getCell(row, col - 1),
+                getCell(row, col + 1)
+            ];
+
+            return adjacentCells.some(adjacentCell => {
+                if (adjacentCell && adjacentCell.querySelector('input').value) {
+                    const adjacentNumber = parseInt(adjacentCell.querySelector('input').value);
+                    return Math.abs(adjacentNumber - number) === 1;
+                }
+                return number === 1; // allow 1 to be placed if no adjacent numbers
+            });
+        }
+
+        function getCell(row, col) {
+            if (row >= 0 && row < 9 && col >= 0 && col < 9) {
+                const index = row * 9 + col;
+                return gridContainer.children[index];
+            }
+            return null;
+        }
+
+        function checkCompletion() {
+            for (let i = 0; i < 81; i++) {
+                const input = gridContainer.children[i].querySelector('input');
+                const index = i;
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                const initialNumber = initialNumbers.find(num => num.row === row && num.col === col);
+
+                // Skip initial numbers
+                if (initialNumber) continue;
+
+                if (!input.value || isNaN(parseInt(input.value, 10)) || !isValidMove(input, parseInt(input.value, 10))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        checkButton.addEventListener('click', () => {
+            if (checkCompletion()) {
+                alert("Congratulations! You have completed the puzzle correctly!");
+            } else {
+                alert("The puzzle is not solved yet. Please try again.");
+            }
+        });
+
+        restartButton.addEventListener('click', () => {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>

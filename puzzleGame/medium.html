@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Cube</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tile3x3 {
+            width: 94px;
+            height: 94px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background-color: #2e8b57;
+        }
+        #puzzle3x3 {
+            width: 310px;
+            height: 310px;
+            border: 2px solid #2e8b57;
+        }
+        #difficulty3x3 {
+            width: 310px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            margin-bottom: 16px;
+        }
+        .difficulty-link3x3 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 2px solid #2e8b57;
+            color: #2e8b57;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .difficulty-link3x3:hover {
+            background-color: #2e8b57;
+            color: white;
+        }
+        .active3x3 {
+            background-color: #2e8b57;
+            color: white;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <h1 class="text-4xl text-[#2e8b57] py-6">Puzzle Cube</h1>
+    <div id="difficulty3x3" class="mb-4">
+        <a href="index.html" class="difficulty-link3x3">Easy</a>
+        <a href="#" class="difficulty-link3x3 active3x3">Medium</a>
+        <a href="hard.html" class="difficulty-link3x3">Hard</a>
+        <a href="extreme.html" class="difficulty-link3x3">Extreme</a>
+    </div>
+    <div class="flex gap-14">
+        <div id="moveCount3x3" class="text-lg font-bold text-[#2e8b57]">Moves: 0</div>
+        <div id="previousMoveCount3x3" class="text-lg font-bold text-[#2e8b57]"></div>
+    </div>
+    <div id="message3x3" class="text-xl font-bold text-[#2e8b57] mb-4"></div>
+    <div id="puzzle3x3" class="grid grid-cols-3 gap-2 mb-4 p-1">
+        <!-- Tiles will be generated here -->
+    </div>
+    <button id="startButton3x3" class="px-4 py-2 bg-[#2e8b57] text-white rounded">Start Game</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const puzzleContainer3x3 = document.getElementById('puzzle3x3');
+            const startButton3x3 = document.getElementById('startButton3x3');
+            const messageContainer3x3 = document.getElementById('message3x3');
+            const moveCountContainer3x3 = document.getElementById('moveCount3x3');
+            const previousMoveCountContainer3x3 = document.getElementById('previousMoveCount3x3');
+            const size3x3 = 3;
+            let tiles3x3 = Array.from({ length: size3x3 * size3x3 }, (_, i) => i);
+            let gameStarted3x3 = false;
+            let moveCount3x3 = 0;
+
+            function shuffleTiles3x3() {
+                tiles3x3.sort(() => Math.random() - 0.5);
+                messageContainer3x3.textContent = '';
+                moveCount3x3 = 0;
+                updateMoveCount3x3();
+                gameStarted3x3 = true;
+            }
+
+            function createTile3x3(value) {
+                const tile = document.createElement('div');
+                tile.className = `tile3x3 ${value === 0 ? 'invisible' : ''}`;
+                tile.textContent = value;
+                tile.dataset.value = value;
+                tile.addEventListener('click', () => {
+                    if (gameStarted3x3) moveTile3x3(value);
+                });
+                return tile;
+            }
+
+            function renderPuzzle3x3() {
+                puzzleContainer3x3.innerHTML = '';
+                tiles3x3.forEach(value => {
+                    puzzleContainer3x3.appendChild(createTile3x3(value));
+                });
+            }
+
+            function moveTile3x3(value) {
+                const index = tiles3x3.indexOf(value);
+                const emptyIndex = tiles3x3.indexOf(0);
+                const [emptyRow, emptyCol] = [Math.floor(emptyIndex / size3x3), emptyIndex % size3x3];
+                const [tileRow, tileCol] = [Math.floor(index / size3x3), index % size3x3];
+
+                if ((Math.abs(emptyRow - tileRow) === 1 && emptyCol === tileCol) || (Math.abs(emptyCol - tileCol) === 1 && emptyRow === tileRow)) {
+                    tiles3x3[emptyIndex] = value;
+                    tiles3x3[index] = 0;
+                    moveCount3x3++;
+                    updateMoveCount3x3();
+                    renderPuzzle3x3();
+                    checkWin3x3();
+                }
+            }
+
+            function updateMoveCount3x3() {
+                moveCountContainer3x3.textContent = `Moves: ${moveCount3x3}`;
+            }
+
+            function checkWin3x3() {
+                if (tiles3x3.every((tile, index) => tile === index)) {
+                    messageContainer3x3.textContent = 'You Win!';
+                    startButton3x3.textContent = 'Restart Game';
+                    startButton3x3.style.display = 'block';
+                    gameStarted3x3 = false;
+                    saveMoveCount3x3();
+                }
+            }
+
+            function saveMoveCount3x3() {
+                const lowestMoveCount3x3 = localStorage.getItem('lowestMoveCount3x3');
+                if (lowestMoveCount3x3 === null || moveCount3x3 < parseInt(lowestMoveCount3x3)) {
+                    localStorage.setItem('lowestMoveCount3x3', moveCount3x3);
+                }
+                updatePreviousMoveCount3x3();
+            }
+
+            function updatePreviousMoveCount3x3() {
+                const lowestMoveCount3x3 = localStorage.getItem('lowestMoveCount3x3');
+                previousMoveCountContainer3x3.textContent = `Lowest Moves: ${lowestMoveCount3x3 === null ? 'N/A' : lowestMoveCount3x3}`;
+            }
+
+            startButton3x3.addEventListener('click', () => {
+                if (startButton3x3.textContent === 'Restart Game') {
+                    startButton3x3.textContent = 'Start Game';
+                }
+                startButton3x3.style.display = 'none';
+                shuffleTiles3x3();
+                renderPuzzle3x3();
+            });
+
+            renderPuzzle3x3();
+            updatePreviousMoveCount3x3();
+        });
+    </script>
+</body>
+</html>

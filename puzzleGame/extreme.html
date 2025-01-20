@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Cube</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .tile {
+            width: 53px; /* Adjusted for 5x5 grid */
+            height: 53px; /* Adjusted for 5x5 grid */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            background-color: #2e8b57;
+        }
+        #puzzle {
+            width: 310px;
+            height: 310px;
+            border: 2px solid #2e8b57;
+        }
+        #difficulty {
+            width: 310px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            margin-bottom: 16px;
+        }
+        .difficulty-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border: 2px solid #2e8b57;
+            color: #2e8b57;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .difficulty-link:hover {
+            background-color: #2e8b57;
+            color: white;
+        }
+        .active {
+            background-color: #2e8b57;
+            color: white;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center h-screen bg-gray-100">
+    <h1 class="text-4xl text-[#2e8b57] py-6">Puzzle Cube</h1>
+    <div id="difficulty" class="mb-4">
+        <a href="index.html" class="difficulty-link">Easy</a>
+        <a href="medium.html" class="difficulty-link">Medium</a>
+        <a href="hard.html" class="difficulty-link">Hard</a>
+        <a href="#" class="difficulty-link active">Extreme</a>
+    </div>
+    <div class="flex gap-14">
+        
+    <div id="moveCounter" class="text-lg font-bold text-[#2e8b57]"></div>
+    <div id="lowestMoves" class="text-lg font-bold text-[#2e8b57]"></div>
+    </div>
+    <div id="message" class="text-xl font-bold text-[#2e8b57] mb-4"></div>
+    <div id="puzzle" class="grid grid-cols-5 gap-2 mb-4 p-1">
+        <!-- Tiles will be generated here -->
+    </div>
+    <button id="startButton" class="px-4 py-2 bg-[#2e8b57] text-white rounded">Start Game</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const puzzleContainer = document.getElementById('puzzle');
+            const startButton = document.getElementById('startButton');
+            const messageContainer = document.getElementById('message');
+            const moveCounter = document.getElementById('moveCounter');
+            const lowestMovesDisplay = document.getElementById('lowestMoves');
+            const size = 5; // Changed to 5x5 grid
+            let tiles = Array.from({ length: size * size }, (_, i) => i);
+            let gameStarted = false; // Track if the game has started
+            let moves = 0; // Track the number of moves
+
+            function updateMoveCounter() {
+                moveCounter.textContent = `Moves: ${moves}`;
+            }
+
+            function updateLowestMoves() {
+                const lowestMoves = localStorage.getItem('lowestMoves');
+                lowestMovesDisplay.textContent = `Lowest Moves: ${lowestMoves ? lowestMoves : 'N/A'}`;
+            }
+
+            function shuffleTiles() {
+                tiles.sort(() => Math.random() - 0.5);
+                messageContainer.textContent = ''; // Clear win message when shuffling
+                gameStarted = true; // Game started after shuffling
+                moves = 0; // Reset moves count
+                updateMoveCounter();
+            }
+
+            function createTile(value) {
+                const tile = document.createElement('div');
+                tile.className = `tile ${value === 0 ? 'invisible' : ''}`;
+                tile.textContent = value;
+                tile.dataset.value = value;
+                tile.addEventListener('click', () => {
+                    if (gameStarted) {
+                        moveTile(value); // Only allow tile movement if game has started
+                    }
+                });
+                return tile;
+            }
+
+            function renderPuzzle() {
+                puzzleContainer.innerHTML = '';
+                tiles.forEach(value => {
+                    puzzleContainer.appendChild(createTile(value));
+                });
+            }
+
+            function moveTile(value) {
+                const index = tiles.indexOf(value);
+                const emptyIndex = tiles.indexOf(0);
+                const [emptyRow, emptyCol] = [Math.floor(emptyIndex / size), emptyIndex % size];
+                const [tileRow, tileCol] = [Math.floor(index / size), index % size];
+
+                if ((Math.abs(emptyRow - tileRow) === 1 && emptyCol === tileCol) || (Math.abs(emptyCol - tileCol) === 1 && emptyRow === tileRow)) {
+                    tiles[emptyIndex] = value;
+                    tiles[index] = 0;
+                    renderPuzzle();
+                    moves++;
+                    updateMoveCounter();
+                    checkWin();
+                }
+            }
+
+            function checkWin() {
+                if (tiles.every((tile, index) => tile === index)) {
+                    messageContainer.textContent = 'You Win!';
+                    startButton.textContent = 'Restart Game'; // Change button text to "Restart Game"
+                    startButton.style.display = 'block'; // Show the button again
+                    gameStarted = false; // Disable further moves
+                    const lowestMoves = localStorage.getItem('lowestMoves');
+                    if (!lowestMoves || moves < lowestMoves) {
+                        localStorage.setItem('lowestMoves', moves);
+                    }
+                    updateLowestMoves();
+                }
+            }
+
+            startButton.addEventListener('click', () => {
+                if (startButton.textContent === 'Restart Game') {
+                    startButton.textContent = 'Start Game'; // Change button text back to "Start Game"
+                }
+                startButton.style.display = 'none'; // Hide the button when the game starts
+                shuffleTiles();
+                renderPuzzle();
+            });
+
+            renderPuzzle(); // Initial render
+            updateMoveCounter();
+            updateLowestMoves();
+        });
+    </script>
+</body>
+</html>
